@@ -55,7 +55,7 @@ public class ChatSocket implements Runnable {
 
             }
             finally{
-                input.close();
+                
                 if(out != null){
                     out.close();
                 }
