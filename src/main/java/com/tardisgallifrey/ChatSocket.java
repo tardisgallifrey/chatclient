@@ -11,7 +11,7 @@ public class ChatSocket implements Runnable {
     private Socket client;
     PrintWriter out;
     BufferedReader in;
-    Scanner input = new Scanner(System.in);
+    Scanner input;
     private final String hostName;
     private final int hostPort;
     private String message = "";    //cannot be null when read by while()
@@ -23,9 +23,13 @@ public class ChatSocket implements Runnable {
 
     @Override
     public void run() {
+        input = new Scanner(System.in);
+        System.out.println("Enter your name or handle for ID.");
+        String clientName = input.nextLine();
 
         while(!message.equals("exit")) {
             try {
+
                 client = new Socket(this.hostName, this.hostPort);
                 client.setKeepAlive(true);
                 if (client.isConnected()) {
@@ -43,7 +47,8 @@ public class ChatSocket implements Runnable {
 
                 //don't send exit as message to server
                 if (!message.equals("exit")){
-                    out.println(message);
+                    out.println(clientName);
+                    out.println(": sends-> "+message);
                     out.flush();
                 }
 
@@ -51,11 +56,12 @@ public class ChatSocket implements Runnable {
             } catch (IOException e) {
                 if (e.getMessage().contains("refuse")) {
                     System.out.println(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
 
             }
             finally{
-                input.close();
+
                 if(out != null){
                     out.close();
                 }
@@ -72,6 +78,9 @@ public class ChatSocket implements Runnable {
                     } catch (IOException e) {
                         e.getLocalizedMessage();
                     }
+                }
+                if(Thread.currentThread().isInterrupted()){
+                    System.exit(1);
                 }
             }
 
