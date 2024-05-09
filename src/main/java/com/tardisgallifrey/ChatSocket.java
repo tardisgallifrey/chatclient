@@ -15,6 +15,7 @@ public class ChatSocket implements Runnable {
     private final String hostName;
     private final int hostPort;
     private String message = "";    //cannot be null when read by while()
+    private boolean firstTime = false;
 
     ChatSocket(String host, int port){
         this.hostName = host;
@@ -32,8 +33,9 @@ public class ChatSocket implements Runnable {
 
                 client = new Socket(this.hostName, this.hostPort);
                 client.setKeepAlive(true);
-                if (client.isConnected()) {
+                if (client.isConnected() && !firstTime) {
                     System.out.println("Chat connection made...");
+                    firstTime = true;
                 }
 
                 //create objects for in and out messages
@@ -50,6 +52,12 @@ public class ChatSocket implements Runnable {
                     out.println(clientName);
                     out.println(": sends-> "+message);
                     out.flush();
+
+                    if ((message = in.readLine()) != null) {
+                        System.out.println(message);
+                    }else{
+                        System.out.println("no message received");
+                    }
                 }
 
 
